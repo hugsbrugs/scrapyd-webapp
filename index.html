@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <title>Scrapyd web manager</title>
+    <!-- Meta -->
+    <meta charset="UTF-8" />
+    <!--<link rel="shortcut icon" href="favicon.ico" />-->
+    <!-- Font Awesome CDN -->
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- BOOTSTRAP -->
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <!-- SYNTAX HIGHLIGHTER -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/styles/shCore.min.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/styles/shThemeDefault.min.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/styles/shThemeRDark.min.css" rel="stylesheet">
+    
+    <style type="text/css">
+    .project-list > span{
+        width:200px;
+        margin-right: 20px;
+        font-weight: bold;
+        font-size: 2em;
+        vertical-align: middle;
+    }
+    .project-list > button{
+        margin-right: 20px;
+    }
+    .center-pills{
+        display: inline-block; 
+    }
+    #spider_content{
+        width:100% !important;
+        display: none;
+    }
+    .syntaxhighlighter {
+        width: 100% !important;
+        margin: 1em 0 1em 0 !important;
+        position: relative !important;
+        overflow: auto !important;
+        font-size: 1em !important;
+        border: 1px solid #808080 !important;
+        max-height: 600px;
+    }
+    </style>
+</head>
+<body>
+
+<!-- SPECIAL DIV TO CENTER SPINNER (https://github.com/fgnass/spin.js/issues/17) -->
+<div id="centerSpin" style="position:fixed;top:50%;left:50%;z-index:15000;"></div>
+
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://backrub.fr">Backrub</a>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="margin-top:50px;padding-top:50px;">
+
+    <h1 class="text-center">Scrapyd web manager</h1>
+    
+    <a href="#" onClick="window.location.reload">refresh</a>
+    <br />
+    Configuration
+    <ul id="config"></ul>
+
+    <fieldset>
+        <legend><h2 class="text-center">Available projects</h2></legend>
+        <ul id="projects"></ul>
+    </fieldset>
+    
+    
+    <hr>
+
+    <div id="project" style="display:none;">
+        <h2 id="current_project" class="text-center"></h2>
+        
+        <div class="row">
+            <div class="col-xs-6">
+                <h3 class="text-center">Project versions (first is latest)</h3>
+                <table class="table table-condensed table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>Version</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody id="project_versions">
+                        <!-- DYNAMICALLY LOADED DATA -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-xs-6">
+                <h3 class="text-center">Available spiders</h3>
+                <table class="table table-condensed table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>Spider</th>
+                            <th>Start</th>
+                        </tr>
+                    </thead>
+                    <tbody id="available_spiders">
+                        <!-- DYNAMICALLY LOADED DATA -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <h3 class="text-center">Spiders</h3>
+            <!-- Nav tabs -->
+            <div class="span12 text-center">
+                <ul class="nav nav-pills center-pills" role="tablist">
+                    <li class="active"><a href="#finished" role="tab" data-toggle="pill"><i class="fa fa-thumbs-up"></i> Finished</a></li>
+                    <li><a href="#running" role="tab" data-toggle="pill"><i class="fa fa-refresh"></i> Running</a></li>
+                    <li><a href="#pending" role="tab" data-toggle="pill"><i class="fa fa-filter"></i> Pending</a></li>
+                </ul>
+            </div>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <!-- FINISHED SPIDERS -->
+                <div class="tab-pane active" id="finished">
+                    <table class="table table-condensed table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>Spider</th>
+                                <th>Start</th>
+                                <th>Duration</th>
+                                <th>Id</th>
+                                <th>Log</th>
+                                <th>Item</th>
+                                <th>Cancel</th>
+                            </tr>
+                        </thead>
+                        <tbody id="finished_spiders">
+                            <!-- DYNAMICALLY LOADED DATA -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- RUNNING SPIDERS -->
+                <div class="tab-pane" id="running">
+                    <!--<ul id="running_spiders"></ul>-->
+                    <table class="table table-condensed table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>Spider</th>
+                                <th>Start</th>
+                                <th>Id</th>
+                                <th>Log</th>
+                                <th>Cancel</th>
+                            </tr>
+                        </thead>
+                        <tbody id="running_spiders">
+                            <!-- DYNAMICALLY LOADED DATA -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- PENDING SPIDERS -->
+                <div class="tab-pane" id="pending">
+                    <!--<ul id="pending_spiders"></ul>-->
+                    <table class="table table-condensed table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>Spider</th>
+                                <th>Id</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pending_spiders">
+                            <!-- DYNAMICALLY LOADED DATA -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <hr>
+    </div>
+    
+</div><!-- // container -->
+
+<h3 class="text-center" id="spider_file"></h3>
+<div class="row" id="spider_content">
+    <pre class="brush: bash"></pre>
+</div>
+
+
+</body>
+
+<!-- JQUERY -->
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>-->
+<!-- BOOTSTRAP -->
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<!-- MOMENT -->
+<script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.min.js"></script>
+<!-- SPIN -->
+<script src="http://cdnjs.cloudflare.com/ajax/libs/spin.js/2.0.1/spin.min.js"></script>
+<!-- SYNTAX HIGHLIGHTER -->
+<script src="http://cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/scripts/shCore.min.js"></script>
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/scripts/shBrushJScript.min.js"></script>-->
+<script src="http://cdnjs.cloudflare.com/ajax/libs/SyntaxHighlighter/3.0.83/scripts/shBrushBash.min.js"></script>
+
+<!-- SCRAPYD -->
+<script src="scrapyd.js"></script>
+</html>
